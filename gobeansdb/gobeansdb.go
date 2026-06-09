@@ -74,6 +74,7 @@ func Main() {
 		logger.Fatalf("fail to init NewHStore %s", err.Error())
 	}
 	storage = &Storage{hstore: hstore}
+	initDataWeb()
 
 	server = mc.NewServer(storage)
 	addr := fmt.Sprintf("%s:%d", conf.Listen, conf.Port)

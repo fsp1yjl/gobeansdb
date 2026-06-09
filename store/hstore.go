@@ -178,8 +178,9 @@ func (store *HStore) Close() {
 
 func (store *HStore) NumKey() (n int) {
 	for _, b := range store.buckets {
-		if b.State == BUCKET_STAT_READY {
-			n += int(b.htree.levels[0][0].count)
+		if b.State == BUCKET_STAT_READY && b.htree != nil {
+			root := b.htree.Update()
+			n += int(root.count)
 		}
 	}
 	return

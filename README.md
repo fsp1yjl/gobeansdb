@@ -58,6 +58,58 @@ mc.get("foo")
 - 最终一致性：同步脚本不断比较一个桶三副本 htree（每个桶一个 16 叉的内存 merkle tree）做同步，比较时间戳。
 - 文件格式：data 文件可以看成 log（顺序写入）； 每个 record 256 bytes 对齐，有 crc 校验。
 
+## HTTP 数据上传（独立服务）
+
+从 v2.1.0.18 起可选开启独立 HTTP 数据服务（与管理 web 端口分离），用于上传对象。
+
+配置项（`server` 段）：
+
+- `data_http_port`: 独立数据服务端口，`0` 表示关闭（默认关闭）
+- `data_http_listen`: 独立数据服务监听地址，留空时复用 `listen`
+- `data_http_auth_token`: 可选鉴权 token；配置后需要请求头 `X-Beansdb-Token`
+- `data_http_access_log`: 独立数据服务访问日志路径（可选）
+
+示例：
+
+```yaml
+server:
+	listen: 0.0.0.0
+	port: 7900
+	web_port: 7903
+	data_http_port: 7904
+	data_http_auth_token: "change-me"
+	data_http_access_log: "./gobeansdb_data_access.log"
+```
+
+数据接口（HTTP CRUD）：
+
+- `PUT /api/v1/object/{key}?flag={int}&exptime={int}`
+- `POST /api/v1/object/{key}?flag={int}&exptime={int}`
+- `GET /api/v1/object/{key}`
+- `DELETE /api/v1/object/{key}`
+
+指标接口：
+
+- `GET /metrics`：返回 `curr_items`、`qps_1m`、延迟分桶、状态码分布、总请求数
+
+健康检查：
+
+- `GET /healthz`
+
+说明：
+
+- 上传 body 为原始二进制
+- 下载返回 `application/octet-stream`，并在 header 中附带 `X-Beansdb-Flag`
+
+示例：
+
+```shell
+curl -X PUT \
+	-H 'X-Beansdb-Token: change-me' \
+	--data-binary @./sample.bin \
+	'http://127.0.0.1:7904/api/v1/object/my_key?flag=0&exptime=0'
+```
+
 ## 在 douban 使用方法
 
 ```

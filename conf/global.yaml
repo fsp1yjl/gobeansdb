@@ -6,6 +6,10 @@ server:
   listen: 0.0.0.0
   port: 7900
   webport: 7903
+  data_http_listen: 0.0.0.0
+  data_http_port: 0
+  data_http_auth_token: ""
+  data_http_access_log: ""
   threads: 4
   errorlog: /var/log/gobeansdb/gobeansdb.log
   accesslog: ""

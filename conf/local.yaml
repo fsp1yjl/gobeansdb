@@ -4,6 +4,10 @@ mc:
 server:
   port: 7980
   webport: 7988
+  data_http_listen: 127.0.0.1
+  data_http_port: 7990
+  data_http_auth_token: ""
+  data_http_access_log: ./data_http_access.log
   errorlog: ./gobeansdb.log
   accesslog: ./access.log
   analysislog: ./gobeansdb_analysis.log
